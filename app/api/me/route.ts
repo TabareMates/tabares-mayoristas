@@ -30,9 +30,21 @@ export async function GET() {
 
   const { data: products } = await admin
     .from('products')
-    .select('*')
+    .select('id, code, name, description, image_url, weight_kg, unit, active, base_price_usd, base_price_ars, base_price_eur, pvp_ars, pvp_eur, pvp_usd, category')
     .eq('active', true)
     .order('code')
 
-  return NextResponse.json({ client, prices: prices ?? [], products: products ?? [] })
+  const { data: variants } = await admin
+    .from('product_variants')
+    .select('*')
+    .eq('active', true)
+
+  const variantsByProductId = (variants ?? []).reduce((acc: Record<string, Array<{id: string; label: string; color: string|null; size: string|null; product_id: string; active: boolean; created_at: string}>>, v) => {
+    const variant = v as {id: string; label: string; color: string|null; size: string|null; product_id: string; active: boolean; created_at: string}
+    if (!acc[variant.product_id]) acc[variant.product_id] = []
+    acc[variant.product_id].push(variant)
+    return acc
+  }, {})
+
+  return NextResponse.json({ client, prices: prices ?? [], products: products ?? [], variantsByProductId })
 }

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Client } from '@/lib/types'
-import { LogOut, Package, ClipboardList, Users, LayoutDashboard, TrendingUp, UserCircle } from 'lucide-react'
+import { LogOut, Package, ClipboardList, Users, LayoutDashboard, TrendingUp, UserCircle, Tag, ShieldCheck } from 'lucide-react'
 
 interface Props {
   client: Client | null
@@ -29,6 +29,8 @@ export default function NavBar({ client }: Props) {
         { href: '/admin/stats', label: 'Facturación', icon: TrendingUp },
         { href: '/admin/products', label: 'Productos', icon: Package },
         { href: '/admin/clients', label: 'Clientes', icon: Users },
+        { href: '/admin/precios', label: 'Precios', icon: Tag },
+        { href: '/admin/garantias', label: 'Garantías', icon: ShieldCheck },
       ]
     : [
         { href: '/catalog', label: 'Catálogo', icon: Package },

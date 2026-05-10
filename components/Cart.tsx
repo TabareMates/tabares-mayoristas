@@ -10,7 +10,7 @@ interface Props {
   items: CartItem[]
   currency: 'USD' | 'ARS' | 'EUR'
   client: Client | null
-  onUpdateItem: (productId: string, quantity: number) => void
+  onUpdateItem: (productId: string, quantity: number, variantLabel?: string) => void
   onOrderPlaced: () => void
 }
 
@@ -63,6 +63,7 @@ export default function Cart({ open, onClose, items, currency, client, onUpdateI
           unit_price_usd: currency === 'USD' ? item.product.price_usd : null,
           unit_price_ars: currency === 'ARS' ? item.product.price_ars : null,
           unit_price_eur: currency === 'EUR' && item.product.price_eur ? item.product.price_eur * IVA : null,
+          variant_label: item.variantLabel || null,
         })),
       }),
     })
@@ -126,18 +127,19 @@ export default function Cart({ open, onClose, items, currency, client, onUpdateI
                   const price = getPrice(item, currency)
                   const lineTotal = price * item.quantity
                   return (
-                    <div key={item.product.id}
+                    <div key={`${item.product.id}-${item.variantLabel ?? ''}`}
                          className="bg-white rounded-xl p-3 flex items-center gap-3">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-[#2D4535] truncate">{item.product.name}</p>
                         <p className="text-xs text-[#2D4535]/50 font-mono">{item.product.code}</p>
+                        {item.variantLabel && <p className="text-xs text-[#2D4535]/40">{item.variantLabel}</p>}
                         <p className="text-sm font-semibold text-[#B8935A] mt-0.5">
                           {formatPrice(lineTotal, currency)}
                         </p>
                       </div>
                       <div className="flex items-center gap-1 bg-[#F0E8D8] rounded-lg px-1">
                         <button
-                          onClick={() => onUpdateItem(item.product.id, item.quantity - 1)}
+                          onClick={() => onUpdateItem(item.product.id, item.quantity - 1, item.variantLabel)}
                           className="p-1 text-[#2D4535]/60 hover:text-[#2D4535]"
                         >
                           {item.quantity === 1 ? <Trash2 size={12} /> : <Minus size={12} />}
@@ -146,7 +148,7 @@ export default function Cart({ open, onClose, items, currency, client, onUpdateI
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => onUpdateItem(item.product.id, item.quantity + 1)}
+                          onClick={() => onUpdateItem(item.product.id, item.quantity + 1, item.variantLabel)}
                           className="p-1 text-[#2D4535]/60 hover:text-[#2D4535]"
                         >
                           <Plus size={12} />

@@ -8,6 +8,18 @@ import Cart from '@/components/Cart'
 import NavBar from '@/components/NavBar'
 import { ShoppingCart } from 'lucide-react'
 
+const CATEGORIES = [
+  { value: 'todos', label: 'Todos' },
+  { value: 'disponibles', label: 'Disponibles' },
+  { value: 'mates', label: 'Mates' },
+  { value: 'materas', label: 'Materas' },
+  { value: 'bombillas', label: 'Bombillas' },
+  { value: 'yerbas', label: 'Yerbas' },
+  { value: 'yerberos', label: 'Yerberos' },
+  { value: 'termos', label: 'Termos' },
+  { value: 'extras', label: 'Extras' },
+]
+
 export default function CatalogPage() {
   const [products, setProducts] = useState<ProductWithPrice[]>([])
   const [client, setClient] = useState<Client | null>(null)
@@ -15,6 +27,8 @@ export default function CatalogPage() {
   const [cartOpen, setCartOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [noProfile, setNoProfile] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState('todos')
+  const [variantsByProductId, setVariantsByProductId] = useState<Record<string, Array<{id: string; label: string}>>>({})
 
   const fetchData = useCallback(async () => {
     try {
@@ -38,8 +52,9 @@ export default function CatalogPage() {
         return
       }
 
-      const { client: clientData, prices, products: productsData } = await res.json()
+      const { client: clientData, prices, products: productsData, variantsByProductId: vbp } = await res.json()
       setClient(clientData)
+      setVariantsByProductId(vbp ?? {})
 
       const priceMap = new Map(prices.map((p: any) => [p.product_id, p]))
       const enriched: ProductWithPrice[] = productsData.map((p: any) => ({
@@ -61,26 +76,26 @@ export default function CatalogPage() {
     fetchData()
   }, [fetchData])
 
-  function addToCart(product: ProductWithPrice, qty: number) {
+  function addToCart(product: ProductWithPrice, qty: number, variantLabel?: string) {
     setCart(prev => {
-      const existing = prev.find(i => i.product.id === product.id)
+      const existing = prev.find(i => i.product.id === product.id && i.variantLabel === variantLabel)
       if (existing) {
         return prev.map(i =>
-          i.product.id === product.id
+          i.product.id === product.id && i.variantLabel === variantLabel
             ? { ...i, quantity: i.quantity + qty }
             : i
         )
       }
-      return [...prev, { product, quantity: qty }]
+      return [...prev, { product, quantity: qty, variantLabel }]
     })
   }
 
-  function updateCartItem(productId: string, quantity: number) {
+  function updateCartItem(productId: string, quantity: number, variantLabel?: string) {
     if (quantity <= 0) {
-      setCart(prev => prev.filter(i => i.product.id !== productId))
+      setCart(prev => prev.filter(i => !(i.product.id === productId && i.variantLabel === variantLabel)))
     } else {
       setCart(prev => prev.map(i =>
-        i.product.id === productId ? { ...i, quantity } : i
+        i.product.id === productId && i.variantLabel === variantLabel ? { ...i, quantity } : i
       ))
     }
   }
@@ -116,7 +131,7 @@ export default function CatalogPage() {
 
       <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-semibold text-[#2D4535]">Catálogo</h1>
             <p className="text-sm text-[#2D4535]/60 mt-1">
@@ -139,24 +154,52 @@ export default function CatalogPage() {
           </button>
         </div>
 
+        {/* Category chips */}
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-3">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat.value}
+              onClick={() => setSelectedCategory(cat.value)}
+              className={`shrink-0 rounded-full px-4 py-1.5 text-sm transition-colors ${
+                selectedCategory === cat.value
+                  ? 'bg-[#2D4535] text-[#F0E8D8]'
+                  : 'bg-white border border-[#2D4535]/20 text-[#2D4535]/60 hover:border-[#2D4535]/40'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
         {/* Product grid */}
-        {products.length === 0 ? (
-          <div className="text-center py-20 text-[#2D4535]/40">
-            <p className="text-lg">No hay productos disponibles</p>
-            <p className="text-sm mt-1">Contactanos si creés que hay un error</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {products.map(product => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                currency={client?.currency ?? 'USD'}
-                onAddToCart={addToCart}
-              />
-            ))}
-          </div>
-        )}
+        {(() => {
+          const filtered = products.filter(p => {
+            if (selectedCategory === 'todos') return true
+            if (selectedCategory === 'disponibles') {
+              const price = client?.currency === 'USD' ? p.price_usd : client?.currency === 'ARS' ? p.price_ars : p.price_eur
+              return price !== null && price !== undefined
+            }
+            return p.category === selectedCategory
+          })
+          return filtered.length === 0 ? (
+            <div className="text-center py-20 text-[#2D4535]/40">
+              <p className="text-lg">No hay productos disponibles</p>
+              <p className="text-sm mt-1">Contactanos si creés que hay un error</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filtered.map(product => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  currency={client?.currency ?? 'USD'}
+                  onAddToCart={addToCart}
+                  variants={variantsByProductId[product.id] ?? []}
+                />
+              ))}
+            </div>
+          )
+        })()}
       </main>
 
       {/* WhatsApp floating button */}
@@ -182,7 +225,7 @@ export default function CatalogPage() {
         items={cart}
         currency={client?.currency ?? 'USD'}
         client={client}
-        onUpdateItem={updateCartItem}
+        onUpdateItem={(productId, quantity, variantLabel) => updateCartItem(productId, quantity, variantLabel)}
         onOrderPlaced={() => {
           setCart([])
           setCartOpen(false)

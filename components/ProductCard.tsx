@@ -8,7 +8,8 @@ import { Plus, Minus, ShoppingCart, X } from 'lucide-react'
 interface Props {
   product: ProductWithPrice
   currency: 'USD' | 'ARS' | 'EUR'
-  onAddToCart: (product: ProductWithPrice, qty: number) => void
+  onAddToCart: (product: ProductWithPrice, qty: number, variantLabel?: string) => void
+  variants?: { id: string; label: string }[]
 }
 
 function formatPrice(value: number | null, currency: 'USD' | 'ARS' | 'EUR'): string {
@@ -20,10 +21,11 @@ function formatPrice(value: number | null, currency: 'USD' | 'ARS' | 'EUR'): str
   }).format(value)
 }
 
-export default function ProductCard({ product, currency, onAddToCart }: Props) {
+export default function ProductCard({ product, currency, onAddToCart, variants = [] }: Props) {
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
   const [showModal, setShowModal] = useState(false)
+  const [selectedVariant, setSelectedVariant] = useState('')
 
   const price = currency === 'USD' ? product.price_usd : currency === 'ARS' ? product.price_ars : product.price_eur
   const hasPrice = price !== null
@@ -32,7 +34,7 @@ export default function ProductCard({ product, currency, onAddToCart }: Props) {
   const priceWithIva = showIva ? price! * (1 + IVA_RATE) : null
 
   function handleAdd() {
-    onAddToCart(product, qty)
+    onAddToCart(product, qty, selectedVariant || undefined)
     setAdded(true)
     setQty(1)
     setTimeout(() => setAdded(false), 1500)
@@ -102,6 +104,10 @@ export default function ProductCard({ product, currency, onAddToCart }: Props) {
                 {showIva && (
                   <p className="text-xs text-[#2D4535]/50 mt-0.5">IVA 21% incluido</p>
                 )}
+                {(() => {
+                  const pvp = currency === 'EUR' ? product.pvp_eur : currency === 'ARS' ? product.pvp_ars : product.pvp_usd
+                  return pvp ? <p className="text-xs text-[#2D4535]/50 mt-0.5">PVP sugerido: {formatPrice(pvp, currency)}</p> : null
+                })()}
               </div>
             ) : (
               <span className="text-sm text-[#2D4535]/40 italic">Precio a consultar</span>
@@ -110,6 +116,24 @@ export default function ProductCard({ product, currency, onAddToCart }: Props) {
 
           {/* Qty + Add */}
           {hasPrice && (
+            <>
+            {variants.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {[...variants, { id: 'surtido', label: 'Surtido' }].map(v => (
+                  <button
+                    key={v.id}
+                    onClick={() => setSelectedVariant(selectedVariant === v.label ? '' : v.label)}
+                    className={`px-2.5 py-1 rounded-full text-xs transition-colors ${
+                      selectedVariant === v.label
+                        ? 'bg-[#2D4535] text-[#F0E8D8]'
+                        : 'bg-[#F0E8D8] text-[#2D4535] hover:bg-[#2D4535]/10'
+                    }`}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 bg-[#F0E8D8] rounded-lg px-1">
                 <button
@@ -140,6 +164,7 @@ export default function ProductCard({ product, currency, onAddToCart }: Props) {
                 {added ? '¡Agregado!' : 'Agregar'}
               </button>
             </div>
+            </>
           )}
         </div>
       </div>
@@ -196,7 +221,28 @@ export default function ProductCard({ product, currency, onAddToCart }: Props) {
                       {showIva && (
                         <p className="text-sm text-[#2D4535]/50 mt-0.5">IVA 21% incluido</p>
                       )}
+                      {(() => {
+                        const pvp = currency === 'EUR' ? product.pvp_eur : currency === 'ARS' ? product.pvp_ars : product.pvp_usd
+                        return pvp ? <p className="text-xs text-[#2D4535]/50 mt-0.5">PVP sugerido: {formatPrice(pvp, currency)}</p> : null
+                      })()}
                     </div>
+                    {variants.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {[...variants, { id: 'surtido', label: 'Surtido' }].map(v => (
+                          <button
+                            key={v.id}
+                            onClick={() => setSelectedVariant(selectedVariant === v.label ? '' : v.label)}
+                            className={`px-2.5 py-1 rounded-full text-xs transition-colors ${
+                              selectedVariant === v.label
+                                ? 'bg-[#2D4535] text-[#F0E8D8]'
+                                : 'bg-[#F0E8D8] text-[#2D4535] hover:bg-[#2D4535]/10'
+                            }`}
+                          >
+                            {v.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1 bg-[#F0E8D8] rounded-lg px-1">
                         <button

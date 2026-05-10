@@ -21,6 +21,13 @@ export type Product = {
   weight_kg: number | null
   unit: string
   active: boolean
+  base_price_usd?: number | null
+  base_price_ars?: number | null
+  base_price_eur?: number | null
+  pvp_ars?: number | null
+  pvp_eur?: number | null
+  pvp_usd?: number | null
+  category?: string | null
 }
 
 export type ClientPrice = {
@@ -36,6 +43,27 @@ export type ProductWithPrice = Product & {
   price_usd: number | null
   price_ars: number | null
   price_eur: number | null
+  pvp_ars?: number | null
+  pvp_eur?: number | null
+  pvp_usd?: number | null
+}
+
+export interface ProductVariant {
+  id: string
+  product_id: string
+  color: string | null
+  size: string | null
+  label: string
+  active: boolean
+  created_at: string
+}
+
+export interface ClientDiscount {
+  id: string
+  client_id: string
+  category: string
+  discount_pct: number
+  created_at: string
 }
 
 export type OrderStatus = 'pending' | 'approved' | 'in_progress' | 'shipped' | 'delivered' | 'cancelled'
@@ -73,6 +101,7 @@ export type OrderItem = {
 export type CartItem = {
   product: ProductWithPrice
   quantity: number
+  variantLabel?: string
 }
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
