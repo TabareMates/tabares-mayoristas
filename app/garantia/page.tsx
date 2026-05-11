@@ -36,7 +36,14 @@ function GarantiaForm() {
 
   useEffect(() => {
     const paramLang = searchParams.get('lang')
-    if (paramLang === 'en') setLang('en')
+    if (paramLang === 'en' || paramLang === 'es') {
+      setLang(paramLang)
+    } else {
+      // Auto-detect from browser language
+      const browserLang = navigator.language || ''
+      if (browserLang.startsWith('en')) setLang('en')
+      // else default stays 'es'
+    }
   }, [searchParams])
 
   const tx = t[lang]
