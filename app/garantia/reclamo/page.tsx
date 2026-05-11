@@ -108,7 +108,7 @@ export default function ReclamoPage() {
               </p>
               <div className="mt-6 p-4 bg-[#F0E8D8] rounded-xl text-sm text-[#2D4535]/70">
                 <p>¿Tenés dudas? Escribinos a</p>
-                <a href="mailto:manuel@tabare.com.ar" className="text-[#B8935A] font-medium">manuel@tabare.com.ar</a>
+                <a href="mailto:hola@tabare.com.ar" className="text-[#B8935A] font-medium">hola@tabare.com.ar</a>
                 <span className="mx-2">·</span>
                 <a href="https://wa.me/5491166407189" className="text-[#25D366] font-medium">WhatsApp</a>
               </div>
