@@ -69,11 +69,15 @@ export default function GarantiaPage() {
               <div className="text-5xl mb-4">🛡️</div>
               <h2 className="text-xl font-semibold text-[#2D4535] mb-2">¡Garantía activada!</h2>
               <p className="text-sm text-[#2D4535]/70 leading-relaxed">
-                Tu garantía queda registrada por 1 año desde la fecha de compra. Si en el futuro necesitás hacer un reclamo, ingresá a <strong>tabares-mayoristas.vercel.app/garantia/reclamo</strong>.
+                Tu garantía queda registrada por 1 año desde la fecha de compra.
               </p>
-              <div className="mt-6 p-4 bg-[#F0E8D8] rounded-xl text-sm text-[#2D4535]/70">
+              <div className="mt-4 p-4 bg-[#2D4535]/5 rounded-xl text-sm text-[#2D4535]/80 flex items-start gap-3 text-left">
+                <span className="text-xl shrink-0">📬</span>
+                <p>Revisá tu mail — te enviamos la confirmación con todos los datos de tu garantía para que la tengas guardada.</p>
+              </div>
+              <div className="mt-4 p-4 bg-[#F0E8D8] rounded-xl text-sm text-[#2D4535]/70">
                 <p>¿Tenés dudas? Escribinos a</p>
-                <a href="mailto:manuel@tabare.com.ar" className="text-[#B8935A] font-medium">manuel@tabare.com.ar</a>
+                <a href="mailto:hola@tabare.com.ar" className="text-[#B8935A] font-medium">hola@tabare.com.ar</a>
               </div>
             </div>
           ) : (

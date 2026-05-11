@@ -97,6 +97,61 @@ export async function sendOrderNotification(params: OrderEmailParams) {
   ])
 }
 
+interface WarrantyConfirmationParams {
+  customerName: string
+  customerEmail: string
+  productDescription: string
+  purchaseDate: string
+  warrantyExpires: string
+  storeName?: string
+}
+
+export async function sendWarrantyConfirmation(params: WarrantyConfirmationParams) {
+  if (!GMAIL_WEBHOOK) return
+
+  const { customerName, customerEmail, productDescription, purchaseDate, warrantyExpires, storeName } = params
+
+  const formatDate = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-')
+    return `${day}/${month}/${year}`
+  }
+
+  const storeBlock = storeName
+    ? `<p style="margin:4px 0;font-size:14px;">📍 <strong>Local:</strong> ${storeName}</p>`
+    : ''
+
+  const html = `
+  <div style="font-family:sans-serif;max-width:540px;margin:0 auto;color:#2D4535;">
+    <div style="background:#2D4535;padding:20px 24px;border-radius:12px 12px 0 0;text-align:center;">
+      <h2 style="color:#F0E8D8;margin:0;font-size:20px;">🛡️ Tu garantía está activada</h2>
+      <p style="color:#F0E8D8;opacity:0.7;margin:6px 0 0;font-size:13px;">Tabaré Mates</p>
+    </div>
+    <div style="background:#fff;padding:24px;border:1px solid #e8e0d4;border-radius:0 0 12px 12px;">
+      <p style="margin:0 0 16px;">Hola <strong>${customerName}</strong>, tu garantía quedó registrada correctamente. Guardá este mail — es tu comprobante.</p>
+
+      <div style="background:#F0E8D8;border-radius:10px;padding:16px;margin-bottom:16px;">
+        <p style="margin:0 0 8px;font-size:13px;color:#2D4535;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Detalle de la garantía</p>
+        <p style="margin:4px 0;font-size:14px;">🧉 <strong>Producto:</strong> ${productDescription}</p>
+        ${storeBlock}
+        <p style="margin:4px 0;font-size:14px;">📅 <strong>Fecha de compra:</strong> ${formatDate(purchaseDate)}</p>
+        <p style="margin:4px 0;font-size:14px;">✅ <strong>Garantía válida hasta:</strong> <span style="color:#2D4535;font-weight:700;">${formatDate(warrantyExpires)}</span></p>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e8e0d4;border-radius:10px;padding:16px;margin-bottom:16px;font-size:13px;color:#666;">
+        <p style="margin:0 0 6px;font-weight:600;color:#2D4535;">¿Necesitás hacer un reclamo?</p>
+        <p style="margin:0;">Ingresá a <a href="https://tabares-mayoristas.vercel.app/garantia/reclamo" style="color:#B8935A;font-weight:600;">tabares-mayoristas.vercel.app/garantia/reclamo</a> y completá el formulario. Respondemos en 48 hs hábiles.</p>
+      </div>
+
+      <div style="font-size:13px;color:#888;border-top:1px solid #e8e0d4;padding-top:12px;text-align:center;">
+        <p style="margin:0;">¿Tenés dudas? Escribinos a <a href="mailto:hola@tabare.com.ar" style="color:#B8935A;">hola@tabare.com.ar</a></p>
+        <p style="margin:8px 0 0;font-size:11px;color:#aaa;">Nuestra producción se realiza junto a las ONGs ADEEI y Punto de Encuentro, impulsando la inclusión laboral.</p>
+      </div>
+    </div>
+  </div>`
+
+  await sendEmail(customerEmail, '🛡️ Tu garantía Tabaré Mates está activada', html)
+}
+
 interface ApprovalEmailParams {
   clientName: string
   clientEmail: string

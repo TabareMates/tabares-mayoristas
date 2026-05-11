@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendWarrantyConfirmation } from '@/lib/email'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
@@ -31,6 +32,16 @@ export async function POST(request: Request) {
     .single()
 
   if (error) return NextResponse.json({ error: 'Error al registrar' }, { status: 500 })
+
+  // Enviar email de confirmación al cliente
+  sendWarrantyConfirmation({
+    customerName: customer_name,
+    customerEmail: customer_email,
+    productDescription: product_description || 'No especificado',
+    purchaseDate: purchase_date,
+    warrantyExpires: warrantyExpiresStr,
+    storeName: store_name || undefined,
+  }).catch(() => {})
 
   if (process.env.SHEETS_WEBHOOK_URL) {
     fetch(process.env.SHEETS_WEBHOOK_URL, {
