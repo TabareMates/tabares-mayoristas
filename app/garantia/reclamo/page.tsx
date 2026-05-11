@@ -301,14 +301,15 @@ export default function ReclamoPage() {
               {loading ? 'Enviando...' : 'Enviar reclamo'}
             </button>
           </form>
-        </div>
-        {/* ADEEI footer */}
-        <div className="mt-8 text-center text-xs text-[#2D4535]/50 leading-relaxed space-y-1">
-          <p>Nuestra producción se realiza en conjunto con las ONGs <strong className="text-[#2D4535]/70">ADEEI</strong> y <strong className="text-[#2D4535]/70">Punto de Encuentro</strong>, impulsando la inclusión laboral y el desarrollo de oportunidades reales a través del trabajo.</p>
-          <p className="flex justify-center gap-4 flex-wrap">
-            <a href="https://www.adeei.org.ar/%C3%A1reas/%C3%A1rea-laboral" target="_blank" rel="noopener noreferrer" className="text-[#B8935A] hover:underline">Conocer más sobre ADEEI</a>
-            <a href="https://puntodeencuentro.org.ar/" target="_blank" rel="noopener noreferrer" className="text-[#B8935A] hover:underline">Conocer más sobre Punto de Encuentro</a>
-          </p>
+
+          {/* ADEEI footer */}
+          <div className="mt-8 text-center text-xs text-[#2D4535]/50 leading-relaxed space-y-2 pb-4">
+            <p>Nuestra producción se realiza en conjunto con las ONGs <strong className="text-[#2D4535]/70">ADEEI</strong> y <strong className="text-[#2D4535]/70">Punto de Encuentro</strong>, impulsando la inclusión laboral y el desarrollo de oportunidades reales a través del trabajo.</p>
+            <p className="flex justify-center gap-4 flex-wrap">
+              <a href="https://www.adeei.org.ar/%C3%A1reas/%C3%A1rea-laboral" target="_blank" rel="noopener noreferrer" className="text-[#B8935A] hover:underline">Conocer más sobre ADEEI</a>
+              <a href="https://puntodeencuentro.org.ar/" target="_blank" rel="noopener noreferrer" className="text-[#B8935A] hover:underline">Conocer más sobre Punto de Encuentro</a>
+            </p>
+          </div>
         </div>
       </div>
     </div>
