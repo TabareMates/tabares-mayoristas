@@ -33,34 +33,35 @@ export async function POST(request: Request) {
 
   if (error) return NextResponse.json({ error: 'Error al registrar' }, { status: 500 })
 
-  // Enviar email de confirmación al cliente
-  sendWarrantyConfirmation({
-    customerName: customer_name,
-    customerEmail: customer_email,
-    productDescription: product_description || 'No especificado',
-    purchaseDate: purchase_date,
-    warrantyExpires: warrantyExpiresStr,
-    storeName: store_name || undefined,
-  }).catch(() => {})
-
-  if (process.env.SHEETS_WEBHOOK_URL) {
-    fetch(process.env.SHEETS_WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'warranty_registration',
-        timestamp: new Date().toISOString(),
-        customer_name,
-        customer_email,
-        country,
-        channel,
-        store_name: store_name || '',
-        product_description: product_description || '',
-        purchase_date,
-        warranty_expires: warrantyExpiresStr,
-      }),
-    }).catch(() => {})
-  }
+  // Enviar email y Sheets en paralelo (awaited para que Vercel no corte la ejecución)
+  await Promise.allSettled([
+    sendWarrantyConfirmation({
+      customerName: customer_name,
+      customerEmail: customer_email,
+      productDescription: product_description || 'No especificado',
+      purchaseDate: purchase_date,
+      warrantyExpires: warrantyExpiresStr,
+      storeName: store_name || undefined,
+    }),
+    process.env.SHEETS_WEBHOOK_URL
+      ? fetch(process.env.SHEETS_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'warranty_registration',
+            timestamp: new Date().toISOString(),
+            customer_name,
+            customer_email,
+            country,
+            channel,
+            store_name: store_name || '',
+            product_description: product_description || '',
+            purchase_date,
+            warranty_expires: warrantyExpiresStr,
+          }),
+        })
+      : Promise.resolve(),
+  ])
 
   return NextResponse.json({ id: data.id })
 }
