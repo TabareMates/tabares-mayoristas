@@ -70,7 +70,7 @@ export default function GarantiaPage() {
               <div className="text-5xl mb-4">🛡️</div>
               <h2 className="text-xl font-semibold text-[#2D4535] mb-2">¡Garantía activada!</h2>
               <p className="text-sm text-[#2D4535]/70 leading-relaxed">
-                Tu garantía queda registrada por 1 año. Si necesitás hacer un reclamo en el futuro, usá el link que te enviamos por email.
+                Tu garantía queda registrada por 1 año desde la fecha de compra. Si en el futuro necesitás hacer un reclamo, ingresá a <strong>tabares-mayoristas.vercel.app/garantia/reclamo</strong>.
               </p>
               <div className="mt-6 p-4 bg-[#F0E8D8] rounded-xl text-sm text-[#2D4535]/70">
                 <p>¿Tenés dudas? Escribinos a</p>
@@ -209,6 +209,14 @@ export default function GarantiaPage() {
               </form>
             </>
           )}
+        </div>
+        {/* ADEEI footer */}
+        <div className="mt-8 text-center text-xs text-[#2D4535]/50 leading-relaxed space-y-1">
+          <p>Nuestra producción se realiza en conjunto con las ONGs <strong className="text-[#2D4535]/70">ADEEI</strong> y <strong className="text-[#2D4535]/70">Punto de Encuentro</strong>, impulsando la inclusión laboral y el desarrollo de oportunidades reales a través del trabajo.</p>
+          <p className="flex justify-center gap-4 flex-wrap">
+            <a href="https://www.adeei.org.ar/%C3%A1reas/%C3%A1rea-laboral" target="_blank" rel="noopener noreferrer" className="text-[#B8935A] hover:underline">Conocer más sobre ADEEI</a>
+            <a href="https://puntodeencuentro.org.ar/" target="_blank" rel="noopener noreferrer" className="text-[#B8935A] hover:underline">Conocer más sobre Punto de Encuentro</a>
+          </p>
         </div>
       </div>
     </div>
