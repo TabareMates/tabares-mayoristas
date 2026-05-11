@@ -101,5 +101,28 @@ export async function POST(request: Request) {
 
   if (error) return NextResponse.json({ error: 'Error al enviar el reclamo' }, { status: 500 })
 
+  // Enviar a Google Sheets
+  if (process.env.SHEETS_WEBHOOK_URL) {
+    fetch(process.env.SHEETS_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'warranty_claim',
+        timestamp: new Date().toISOString(),
+        customer_name,
+        customer_email,
+        country,
+        channel,
+        store_name: store_name || '',
+        product_description: product_description || '',
+        issue_type,
+        description,
+        photo_1,
+        photo_2,
+        photo_3,
+      }),
+    }).catch(() => {})
+  }
+
   return NextResponse.json({ id: data.id })
 }

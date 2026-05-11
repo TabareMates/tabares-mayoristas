@@ -12,7 +12,6 @@ const COUNTRIES = [
 const CHANNELS = [
   { value: 'local', label: 'Local físico' },
   { value: 'online', label: 'Tienda online' },
-  { value: 'mayorista', label: 'Distribuidor mayorista' },
   { value: 'otro', label: 'Otro' },
 ]
 
