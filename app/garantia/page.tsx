@@ -87,6 +87,16 @@ export default function GarantiaPage() {
                   Registrá tu compra para activar tu garantía. <br />
                   La garantía cubre 1 año desde la fecha de compra.
                 </p>
+
+                {/* ADEEI hook */}
+                <div className="mt-4 mx-auto max-w-sm bg-[#2D4535]/5 rounded-xl px-4 py-3 text-xs text-[#2D4535]/70 leading-relaxed">
+                  <p className="font-semibold text-[#2D4535] mb-1">¿Sabías que?</p>
+                  <p>Nuestra producción se realiza junto a las ONGs <strong>ADEEI</strong> y <strong>Punto de Encuentro</strong>, impulsando la inclusión laboral a través del trabajo.</p>
+                  <div className="flex gap-3 mt-2 flex-wrap">
+                    <a href="https://www.adeei.org.ar/%C3%A1reas/%C3%A1rea-laboral" target="_blank" rel="noopener noreferrer" className="text-[#B8935A] hover:underline font-medium">Conocer ADEEI →</a>
+                    <a href="https://puntodeencuentro.org.ar/" target="_blank" rel="noopener noreferrer" className="text-[#B8935A] hover:underline font-medium">Conocer Punto de Encuentro →</a>
+                  </div>
+                </div>
               </div>
 
               <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 shadow-sm border border-[#2D4535]/10 space-y-4">
@@ -209,14 +219,6 @@ export default function GarantiaPage() {
             </>
           )}
 
-          {/* ADEEI footer */}
-          <div className="mt-8 text-center text-xs text-[#2D4535]/50 leading-relaxed space-y-2 pb-4">
-            <p>Nuestra producción se realiza en conjunto con las ONGs <strong className="text-[#2D4535]/70">ADEEI</strong> y <strong className="text-[#2D4535]/70">Punto de Encuentro</strong>, impulsando la inclusión laboral y el desarrollo de oportunidades reales a través del trabajo.</p>
-            <p className="flex justify-center gap-4 flex-wrap">
-              <a href="https://www.adeei.org.ar/%C3%A1reas/%C3%A1rea-laboral" target="_blank" rel="noopener noreferrer" className="text-[#B8935A] hover:underline">Conocer más sobre ADEEI</a>
-              <a href="https://puntodeencuentro.org.ar/" target="_blank" rel="noopener noreferrer" className="text-[#B8935A] hover:underline">Conocer más sobre Punto de Encuentro</a>
-            </p>
-          </div>
         </div>
       </div>
     </div>
