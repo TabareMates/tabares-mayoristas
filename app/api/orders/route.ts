@@ -55,6 +55,7 @@ export async function POST(request: Request) {
       unit_price_usd: item.unit_price_usd,
       unit_price_ars: item.unit_price_ars,
       unit_price_eur: item.unit_price_eur,
+      variant_label: item.variant_label || null,
     }))
   )
 

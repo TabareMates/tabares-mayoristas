@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '*.mitiendanube.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'ahbniyqwhhjkfqouzkzy.supabase.co',
+      },
     ],
   },
 };

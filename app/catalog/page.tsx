@@ -29,6 +29,7 @@ export default function CatalogPage() {
   const [noProfile, setNoProfile] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('todos')
   const [variantsByProductId, setVariantsByProductId] = useState<Record<string, Array<{id: string; label: string}>>>({})
+  const [priceList, setPriceList] = useState<{ show_iva: boolean; iva_rate: number; name: string; currency: string } | null>(null)
 
   const fetchData = useCallback(async () => {
     try {
@@ -52,9 +53,10 @@ export default function CatalogPage() {
         return
       }
 
-      const { client: clientData, prices, products: productsData, variantsByProductId: vbp } = await res.json()
+      const { client: clientData, prices, products: productsData, variantsByProductId: vbp, priceList: pl } = await res.json()
       setClient(clientData)
       setVariantsByProductId(vbp ?? {})
+      setPriceList(pl ?? null)
 
       const priceMap = new Map(prices.map((p: any) => [p.product_id, p]))
       const enriched: ProductWithPrice[] = productsData.map((p: any) => ({
@@ -195,6 +197,8 @@ export default function CatalogPage() {
                   currency={client?.currency ?? 'USD'}
                   onAddToCart={addToCart}
                   variants={variantsByProductId[product.id] ?? []}
+                  showIva={priceList?.show_iva ?? false}
+                  ivaRate={priceList?.iva_rate ?? 0.21}
                 />
               ))}
             </div>
@@ -230,6 +234,8 @@ export default function CatalogPage() {
           setCart([])
           setCartOpen(false)
         }}
+        showIva={priceList?.show_iva ?? false}
+        ivaRate={priceList?.iva_rate ?? 0.21}
       />
     </div>
   )

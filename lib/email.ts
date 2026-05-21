@@ -1,5 +1,14 @@
 const GMAIL_WEBHOOK = process.env.GMAIL_WEBHOOK_URL
 
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
 interface OrderEmailParams {
   clientName: string
   clientEmail: string
@@ -58,7 +67,7 @@ export async function sendOrderNotification(params: OrderEmailParams) {
       </table>
       ${shippingCost ? `<p style="text-align:right;font-size:13px;color:#666;margin-top:8px;">Envío estimado: ${formatCurrency(shippingCost, currency)}</p>` : ''}
       <p style="text-align:right;font-size:18px;font-weight:bold;color:#B8935A;margin:8px 0 16px;">Total: ${formatCurrency(total, currency)}</p>
-      ${comments ? `<div style="padding:12px;background:#F0E8D8;border-radius:8px;font-size:13px;margin-bottom:16px;"><strong>Comentario:</strong> ${comments}</div>` : ''}
+      ${comments ? `<div style="padding:12px;background:#F0E8D8;border-radius:8px;font-size:13px;margin-bottom:16px;"><strong>Comentario:</strong> ${escapeHtml(comments)}</div>` : ''}
       <div style="font-size:13px;color:#666;border-top:1px solid #e8e0d4;padding-top:12px;">
         <p style="margin:0;">📧 <a href="mailto:${clientEmail}" style="color:#B8935A;">${clientEmail}</a></p>
         <p style="margin:6px 0 0;"><a href="https://tabares-mayoristas.vercel.app/admin" style="color:#2D4535;font-weight:bold;">Ver en el panel →</a></p>
@@ -173,7 +182,7 @@ export async function sendApprovalNotification(params: ApprovalEmailParams) {
     : ''
 
   const notesLine = adminNotes
-    ? `<div style="padding:12px;background:#F0E8D8;border-radius:8px;font-size:13px;margin-top:16px;"><strong>Nota:</strong> ${adminNotes}</div>`
+    ? `<div style="padding:12px;background:#F0E8D8;border-radius:8px;font-size:13px;margin-top:16px;"><strong>Nota:</strong> ${escapeHtml(adminNotes)}</div>`
     : ''
 
   const clientHtml = `

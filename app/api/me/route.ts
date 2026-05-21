@@ -23,10 +23,45 @@ export async function GET() {
     return NextResponse.json({ error: 'No client profile', userId: user.id }, { status: 404 })
   }
 
-  const { data: prices } = await admin
-    .from('client_prices')
-    .select('product_id, price_usd, price_ars, price_eur')
-    .eq('client_id', client.id)
+  // Fetch price list info if client has one
+  let priceList = null
+  let prices: { product_id: string; price_usd: number | null; price_ars: number | null; price_eur: number | null }[] = []
+
+  if (client.price_list_id) {
+    const { data: pl } = await admin
+      .from('price_lists')
+      .select('*')
+      .eq('id', client.price_list_id)
+      .single()
+
+    priceList = pl
+
+    if (pl) {
+      const { data: items } = await admin
+        .from('price_list_items')
+        .select('product_id, price')
+        .eq('price_list_id', pl.id)
+
+      // Map price_list_items to the format the frontend expects
+      const currency = pl.currency as 'USD' | 'ARS' | 'EUR'
+      prices = (items ?? []).map((item: { product_id: string; price: number }) => ({
+        product_id: item.product_id,
+        price_usd: currency === 'USD' ? item.price : null,
+        price_ars: currency === 'ARS' ? item.price : null,
+        price_eur: currency === 'EUR' ? item.price : null,
+      }))
+
+      // Override client currency with price list currency
+      client.currency = currency
+    }
+  } else {
+    // Legacy: use client_prices table
+    const { data } = await admin
+      .from('client_prices')
+      .select('product_id, price_usd, price_ars, price_eur')
+      .eq('client_id', client.id)
+    prices = data ?? []
+  }
 
   const { data: products } = await admin
     .from('products')
@@ -46,5 +81,11 @@ export async function GET() {
     return acc
   }, {})
 
-  return NextResponse.json({ client, prices: prices ?? [], products: products ?? [], variantsByProductId })
+  return NextResponse.json({
+    client,
+    prices: prices ?? [],
+    products: products ?? [],
+    variantsByProductId,
+    priceList,
+  })
 }

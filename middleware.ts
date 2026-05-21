@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -29,9 +29,10 @@ export async function proxy(request: NextRequest) {
   const isCallback = request.nextUrl.pathname.startsWith('/auth/')
   const isApi = request.nextUrl.pathname.startsWith('/api/')
   const isAdmin = request.nextUrl.pathname.startsWith('/admin')
+  const isGarantia = request.nextUrl.pathname.startsWith('/garantia')
 
-  // Redirect unauthenticated users to login
-  if (!user && !isAuthPage && !isCallback && !isApi) {
+  // Redirect unauthenticated users to login (except public pages)
+  if (!user && !isAuthPage && !isCallback && !isApi && !isGarantia) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 

@@ -7,7 +7,7 @@ import { ChevronDown, ChevronUp, RefreshCw, CheckCircle2, Circle, CalendarDays }
 import { useRouter } from 'next/navigation'
 
 function formatPrice(value: number | null, currency?: string): string {
-  if (!value) return '—'
+  if (value === null || value === undefined) return '—'
   return new Intl.NumberFormat('es-AR', {
     style: 'currency',
     currency: currency ?? 'USD',

@@ -1,3 +1,16 @@
+export type PriceList = {
+  id: string
+  name: string
+  slug: string
+  currency: 'USD' | 'ARS' | 'EUR'
+  description: string | null
+  show_iva: boolean
+  iva_rate: number
+  active: boolean
+  sort_order: number
+  created_at: string
+}
+
 export type Client = {
   id: string
   user_id: string
@@ -9,6 +22,7 @@ export type Client = {
   is_admin: boolean
   notes: string | null
   active: boolean
+  price_list_id: string | null
   created_at: string
 }
 

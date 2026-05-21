@@ -6,7 +6,7 @@ import NavBar from '@/components/NavBar'
 import { ChevronDown, ChevronUp, Package } from 'lucide-react'
 
 function formatPrice(value: number | null, currency: 'USD' | 'ARS' | 'EUR'): string {
-  if (!value) return '—'
+  if (value === null || value === undefined) return '—'
   return new Intl.NumberFormat('es-AR', {
     style: 'currency',
     currency,

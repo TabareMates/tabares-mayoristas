@@ -33,7 +33,14 @@ export async function PATCH(request: Request) {
   const user = await verifyAdmin()
   if (!user) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   const admin = createAdminClient()
-  const { id, ...fields } = await request.json()
+  const body = await request.json()
+  const { id } = body
+  const ALLOWED_FIELDS = ['name', 'code', 'description', 'image_url', 'weight_kg', 'unit', 'active', 'base_price_usd', 'base_price_ars', 'base_price_eur', 'pvp_ars', 'pvp_eur', 'pvp_usd', 'category']
+  const fields: Record<string, unknown> = {}
+  for (const key of ALLOWED_FIELDS) {
+    if (key in body) fields[key] = body[key]
+  }
+  if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
   const { error } = await admin.from('products').update(fields).eq('id', id)
   if (error) return NextResponse.json({ error: 'Update failed' }, { status: 500 })
   return NextResponse.json({ ok: true })

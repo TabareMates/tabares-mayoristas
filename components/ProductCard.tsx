@@ -10,6 +10,8 @@ interface Props {
   currency: 'USD' | 'ARS' | 'EUR'
   onAddToCart: (product: ProductWithPrice, qty: number, variantLabel?: string) => void
   variants?: { id: string; label: string }[]
+  showIva?: boolean
+  ivaRate?: number
 }
 
 function formatPrice(value: number | null, currency: 'USD' | 'ARS' | 'EUR'): string {
@@ -21,17 +23,19 @@ function formatPrice(value: number | null, currency: 'USD' | 'ARS' | 'EUR'): str
   }).format(value)
 }
 
-export default function ProductCard({ product, currency, onAddToCart, variants = [] }: Props) {
+export default function ProductCard({ product, currency, onAddToCart, variants = [], showIva = false, ivaRate = 0.21 }: Props) {
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [selectedVariant, setSelectedVariant] = useState('')
 
   const price = currency === 'USD' ? product.price_usd : currency === 'ARS' ? product.price_ars : product.price_eur
-  const hasPrice = price !== null
-  const IVA_RATE = 0.21
-  const showIva = currency === 'EUR' && hasPrice
-  const priceWithIva = showIva ? price! * (1 + IVA_RATE) : null
+  const hasPrice = price !== null && price !== undefined
+
+  // IVA breakdown: always show for ARS, or when showIva is true
+  const shouldShowIva = showIva || currency === 'ARS'
+  const sinIva = hasPrice && shouldShowIva && price > 0 ? Math.round(price / (1 + ivaRate)) : null
+  const ivaAmount = hasPrice && shouldShowIva && sinIva !== null ? price - sinIva : null
 
   function handleAdd() {
     onAddToCart(product, qty, selectedVariant || undefined)
@@ -99,14 +103,16 @@ export default function ProductCard({ product, currency, onAddToCart, variants =
             {hasPrice ? (
               <div>
                 <span className="text-xl font-semibold text-[#B8935A]">
-                  {formatPrice(showIva ? priceWithIva : price, currency)}
+                  {formatPrice(price, currency)}
                 </span>
-                {showIva && (
-                  <p className="text-xs text-[#2D4535]/50 mt-0.5">IVA 21% incluido</p>
+                {shouldShowIva && sinIva !== null && ivaAmount !== null && (
+                  <p className="text-xs text-[#2D4535]/50 mt-0.5">
+                    Sin IVA: {formatPrice(sinIva, currency)} + IVA: {formatPrice(ivaAmount, currency)}
+                  </p>
                 )}
                 {(() => {
                   const pvp = currency === 'EUR' ? product.pvp_eur : currency === 'ARS' ? product.pvp_ars : product.pvp_usd
-                  return pvp ? <p className="text-xs text-[#2D4535]/50 mt-0.5">PVP sugerido: {formatPrice(pvp, currency)}</p> : null
+                  return pvp && pvp !== price ? <p className="text-xs text-[#2D4535]/50 mt-0.5">PVP sugerido: {formatPrice(pvp, currency)}</p> : null
                 })()}
               </div>
             ) : (
@@ -216,14 +222,16 @@ export default function ProductCard({ product, currency, onAddToCart, variants =
                   <div className="mt-4 pt-4 border-t border-[#2D4535]/10">
                     <div className="mb-3">
                       <span className="text-2xl font-bold text-[#B8935A]">
-                        {formatPrice(showIva ? priceWithIva : price, currency)}
+                        {formatPrice(price, currency)}
                       </span>
-                      {showIva && (
-                        <p className="text-sm text-[#2D4535]/50 mt-0.5">IVA 21% incluido</p>
+                      {shouldShowIva && sinIva !== null && ivaAmount !== null && (
+                        <p className="text-sm text-[#2D4535]/50 mt-0.5">
+                          Sin IVA: {formatPrice(sinIva, currency)} + IVA: {formatPrice(ivaAmount, currency)}
+                        </p>
                       )}
                       {(() => {
                         const pvp = currency === 'EUR' ? product.pvp_eur : currency === 'ARS' ? product.pvp_ars : product.pvp_usd
-                        return pvp ? <p className="text-xs text-[#2D4535]/50 mt-0.5">PVP sugerido: {formatPrice(pvp, currency)}</p> : null
+                        return pvp && pvp !== price ? <p className="text-xs text-[#2D4535]/50 mt-0.5">PVP sugerido: {formatPrice(pvp, currency)}</p> : null
                       })()}
                     </div>
                     {variants.length > 0 && (

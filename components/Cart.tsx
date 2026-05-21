@@ -12,6 +12,8 @@ interface Props {
   client: Client | null
   onUpdateItem: (productId: string, quantity: number, variantLabel?: string) => void
   onOrderPlaced: () => void
+  showIva?: boolean
+  ivaRate?: number
 }
 
 function formatPrice(value: number, currency: 'USD' | 'ARS' | 'EUR'): string {
@@ -22,15 +24,13 @@ function formatPrice(value: number, currency: 'USD' | 'ARS' | 'EUR'): string {
   }).format(value)
 }
 
-const IVA = 1.21
-
 function getPrice(item: CartItem, currency: 'USD' | 'ARS' | 'EUR'): number {
   if (currency === 'USD') return item.product.price_usd ?? 0
   if (currency === 'ARS') return item.product.price_ars ?? 0
-  return (item.product.price_eur ?? 0) * IVA
+  return item.product.price_eur ?? 0
 }
 
-export default function Cart({ open, onClose, items, currency, client, onUpdateItem, onOrderPlaced }: Props) {
+export default function Cart({ open, onClose, items, currency, client, onUpdateItem, onOrderPlaced, showIva = false, ivaRate = 0.21 }: Props) {
   const [comments, setComments] = useState('')
   const [shippingCost, setShippingCost] = useState('')
   const [placing, setPlacing] = useState(false)
@@ -62,7 +62,7 @@ export default function Cart({ open, onClose, items, currency, client, onUpdateI
           quantity: item.quantity,
           unit_price_usd: currency === 'USD' ? item.product.price_usd : null,
           unit_price_ars: currency === 'ARS' ? item.product.price_ars : null,
-          unit_price_eur: currency === 'EUR' && item.product.price_eur ? item.product.price_eur * IVA : null,
+          unit_price_eur: currency === 'EUR' ? item.product.price_eur : null,
           variant_label: item.variantLabel || null,
         })),
       }),
@@ -186,10 +186,27 @@ export default function Cart({ open, onClose, items, currency, client, onUpdateI
 
                 {/* Totals */}
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between text-[#2D4535]/60">
-                    <span>Subtotal{currency === 'EUR' ? ' (IVA 21% incl.)' : ''}</span>
-                    <span>{formatPrice(subtotal, currency)}</span>
-                  </div>
+                  {showIva ? (
+                    <>
+                      <div className="flex justify-between text-[#2D4535]/60">
+                        <span>Subtotal sin IVA</span>
+                        <span>{formatPrice(Math.round(subtotal / (1 + ivaRate)), currency)}</span>
+                      </div>
+                      <div className="flex justify-between text-[#2D4535]/60">
+                        <span>IVA ({Math.round(ivaRate * 100)}%)</span>
+                        <span>{formatPrice(subtotal - Math.round(subtotal / (1 + ivaRate)), currency)}</span>
+                      </div>
+                      <div className="flex justify-between text-[#2D4535]/60">
+                        <span>Subtotal con IVA</span>
+                        <span>{formatPrice(subtotal, currency)}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex justify-between text-[#2D4535]/60">
+                      <span>Subtotal</span>
+                      <span>{formatPrice(subtotal, currency)}</span>
+                    </div>
+                  )}
                   {shipping > 0 && (
                     <div className="flex justify-between text-[#2D4535]/60">
                       <span>Envío estimado</span>
