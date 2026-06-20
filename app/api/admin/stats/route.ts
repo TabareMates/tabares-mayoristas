@@ -22,7 +22,7 @@ export async function GET() {
     { data: clients },
     { data: goals },
   ] = await Promise.all([
-    admin.from('orders').select('*, clients(id, name, currency)').neq('status', 'cancelled'),
+    admin.from('orders').select('*, clients(id, name, currency)').in('status', ['approved', 'in_progress', 'shipped', 'delivered']),
     admin.from('clients').select('id, name, currency').eq('is_admin', false).eq('active', true).order('name'),
     admin.from('billing_goals').select('*'),
   ])
